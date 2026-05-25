@@ -27,8 +27,10 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
-            ->brandName('SANZAHRA')
+            ->brandName('SANZAHRA Admin')
             ->favicon(asset('favicon.svg'))
+            ->brandLogo(asset('assets/favicon.svg'))
+            ->navigationGroups(['Contenido', 'Configuración', 'Sistema'])
             ->colors([
                 'primary' => Color::Stone,
                 'gray' => Color::Stone,

@@ -20,6 +20,8 @@ class BlockResource extends Resource
 
     protected static ?string $navigationLabel = 'Bloques';
 
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static ?string $modelLabel = 'Bloque';
 
     protected static ?string $pluralModelLabel = 'Bloques';
@@ -56,7 +58,7 @@ class BlockResource extends Resource
             ->defaultItems(0);
     }
 
-    protected static function getDataSchema(?string $type): array
+    public static function getDataSchema(?string $type): array
     {
         return match ($type) {
 

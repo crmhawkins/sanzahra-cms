@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\PageResource\RelationManagers;
 
+use App\Filament\Resources\BlockResource;
+use App\Models\Block;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -12,64 +14,28 @@ class BlocksRelationManager extends RelationManager
 {
     protected static string $relationship = 'blocks';
 
-    protected static ?string $title = 'Bloques';
+    protected static ?string $title = 'Secciones de esta página';
 
     public function form(Form $form): Form
     {
-        return $form->schema([
-            Forms\Components\TextInput::make('key')
-                ->label('Clave')
-                ->required()
-                ->maxLength(255),
+        return $form->schema(function (?Block $record): array {
+            $type = $record?->type;
 
-            Forms\Components\TextInput::make('label')
-                ->label('Etiqueta')
-                ->required()
-                ->maxLength(255),
+            return [
+                Forms\Components\Section::make('Etiqueta')
+                    ->schema([
+                        Forms\Components\TextInput::make('label')
+                            ->label('Nombre de esta sección')
+                            ->required()
+                            ->maxLength(255),
+                    ]),
 
-            Forms\Components\Select::make('type')
-                ->label('Tipo')
-                ->options([
-                    'hero_slider'       => 'Hero Slider (carrusel)',
-                    'marquee'           => 'Marquee animado',
-                    'intro_text'        => 'Intro 2-columnas',
-                    'image_break'       => 'Image Break',
-                    'services_grid'     => 'Grid de Servicios',
-                    'portfolio_teaser'  => 'Portfolio Teaser',
-                    'cta_final'         => 'CTA Final',
-                    'page_hero'         => 'Page Hero',
-                    'breadcrumb'        => 'Breadcrumb',
-                    'pull_quote'        => 'Cita destacada',
-                    'full_image'        => 'Imagen full-width',
-                    'two_column'        => 'Dos columnas texto+imagen',
-                    'stat_block'        => 'Bloque estadística',
-                    'timeline'          => 'Timeline (hitos)',
-                    'team_grid'         => 'Grid equipo',
-                    'features_row'      => 'Fila de features',
-                    'service_rows'      => 'Filas de servicios',
-                    'marcas_propias'    => 'Marcas propias',
-                    'talento_form'      => 'Formulario talento',
-                    'identidad_tags'    => 'Identidad con tags',
-                    'desfiles_cta'      => 'Desfiles CTA',
-                    'gallery'           => 'Galería',
-                    'process_grid'      => 'Grid de proceso',
-                    'partner'           => 'Partner',
-                    'portfolio_filters' => 'Filtros portfolio',
-                    'masonry'           => 'Masonry portfolio',
-                    'contact_duo'       => 'Contacto',
-                    'legal_sections'    => 'Secciones legales',
-                ])
-                ->required(),
-
-            Forms\Components\TextInput::make('order')
-                ->label('Orden')
-                ->numeric()
-                ->default(0),
-
-            Forms\Components\Toggle::make('is_active')
-                ->label('Activo')
-                ->default(true),
-        ]);
+                Forms\Components\Section::make('Contenido')
+                    ->description('Edita el contenido visible de esta sección en la web.')
+                    ->schema(BlockResource::getDataSchema($type))
+                    ->statePath('data'),
+            ];
+        });
     }
 
     public function table(Table $table): Table
@@ -77,26 +43,33 @@ class BlocksRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('label')
             ->columns([
-                Tables\Columns\TextColumn::make('key')->label('Clave'),
-                Tables\Columns\TextColumn::make('label')->label('Etiqueta'),
-                Tables\Columns\BadgeColumn::make('type')->label('Tipo'),
-                Tables\Columns\TextColumn::make('order')->label('Orden')->sortable(),
-                Tables\Columns\ToggleColumn::make('is_active')->label('Activo'),
+                Tables\Columns\TextColumn::make('order')
+                    ->label('#')
+                    ->sortable()
+                    ->width('50px'),
+
+                Tables\Columns\TextColumn::make('label')
+                    ->label('Sección')
+                    ->description(fn (Block $record): string => $record->key)
+                    ->searchable()
+                    ->wrap(),
+
+                Tables\Columns\BadgeColumn::make('type')
+                    ->label('Tipo'),
+
+                Tables\Columns\ToggleColumn::make('is_active')
+                    ->label('Visible'),
             ])
             ->defaultSort('order')
             ->reorderable('order')
             ->filters([])
-            ->headerActions([
-                Tables\Actions\CreateAction::make(),
-            ])
+            ->headerActions([])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->label('Editar')
+                    ->slideOver()
+                    ->icon('heroicon-o-pencil-square'),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
-            ]);
+            ->bulkActions([]);
     }
 }
