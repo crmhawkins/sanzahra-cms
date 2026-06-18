@@ -2,23 +2,22 @@
 
 @section('content')
 
+  @php $legal = $page->blockByKey('legal_content'); @endphp
   <main class="legal">
-    @php $sections = $page->blockByKey('legal_sections')?->get('sections', []); @endphp
+    <h1>Pol&iacute;tica de Privacidad</h1>
+    <p class="legal-meta">&Uacute;ltima actualizaci&oacute;n: {{ $legal?->get('last_updated', 'Abril 2026') }}</p>
+
+    <p>{!! $legal?->get('intro', 'En SANZAHRA nos tomamos muy en serio la protecci&oacute;n de los datos personales de nuestros usuarios, clientes y visitantes. Esta Pol&iacute;tica de Privacidad describe c&oacute;mo recogemos, utilizamos y protegemos la informaci&oacute;n que nos facilitas a trav&eacute;s de este sitio web, en cumplimiento del Reglamento (UE) 2016/679 General de Protecci&oacute;n de Datos (RGPD) y de la Ley Org&aacute;nica 3/2018, de Protecci&oacute;n de Datos Personales y garant&iacute;a de los derechos digitales (LOPDGDD).') !!}</p>
+
+    @php $sections = $page->blockByKey('legal_content')?->get('sections', []); @endphp
     @if($sections)
-      <h1>{{ $page->title }}</h1>
-      <p class="legal-meta">{{ $page->blockByKey('legal_sections')?->get('last_updated', 'Última actualización: Abril 2026') }}</p>
-      @foreach($sections as $section)
-        @if(!empty($section['heading']))
-          <h2>{{ $section['heading'] }}</h2>
+      @foreach($sections as $s)
+        @if(!empty($s['heading']))
+          <h2>{{ $s['heading'] }}</h2>
         @endif
-        {!! $section['content'] ?? '' !!}
+        <p>{!! $s['content'] !!}</p>
       @endforeach
     @else
-      <h1>Pol&iacute;tica de Privacidad</h1>
-      <p class="legal-meta">&Uacute;ltima actualizaci&oacute;n: Abril 2026</p>
-
-      <p>En SANZAHRA nos tomamos muy en serio la protecci&oacute;n de los datos personales de nuestros usuarios, clientes y visitantes. Esta Pol&iacute;tica de Privacidad describe c&oacute;mo recogemos, utilizamos y protegemos la informaci&oacute;n que nos facilitas a trav&eacute;s de este sitio web, en cumplimiento del Reglamento (UE) 2016/679 General de Protecci&oacute;n de Datos (RGPD) y de la Ley Org&aacute;nica 3/2018, de Protecci&oacute;n de Datos Personales y garant&iacute;a de los derechos digitales (LOPDGDD).</p>
-
       <h2>1. Responsable del tratamiento</h2>
       <p>El responsable del tratamiento de los datos personales recabados a trav&eacute;s de este sitio web es SANZAHRA, con domicilio social en Calle C&oacute;rdoba 6, 29001 M&aacute;laga (Espa&ntilde;a), provista de CIF B-00000000 y direcci&oacute;n de contacto <a href="mailto:info@sanzahra.com">info@sanzahra.com</a>.</p>
 

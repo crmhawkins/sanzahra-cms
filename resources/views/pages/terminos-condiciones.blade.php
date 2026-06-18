@@ -2,23 +2,22 @@
 
 @section('content')
 
+  @php $legal = $page->blockByKey('legal_content'); @endphp
   <main class="legal">
-    @php $sections = $page->blockByKey('legal_sections')?->get('sections', []); @endphp
+    <h1>T&eacute;rminos y Condiciones</h1>
+    <p class="legal-meta">&Uacute;ltima actualizaci&oacute;n: {{ $legal?->get('last_updated', 'Abril 2026') }}</p>
+
+    <p>{!! $legal?->get('intro', 'Las presentes condiciones regulan el acceso y uso del sitio web titularidad de SANZAHRA. El acceso y navegaci&oacute;n por este sitio implica la aceptaci&oacute;n sin reservas de los t&eacute;rminos recogidos en este documento.') !!}</p>
+
+    @php $sections = $page->blockByKey('legal_content')?->get('sections', []); @endphp
     @if($sections)
-      <h1>{{ $page->title }}</h1>
-      <p class="legal-meta">{{ $page->blockByKey('legal_sections')?->get('last_updated', 'Última actualización: Abril 2026') }}</p>
-      @foreach($sections as $section)
-        @if(!empty($section['heading']))
-          <h2>{{ $section['heading'] }}</h2>
+      @foreach($sections as $s)
+        @if(!empty($s['heading']))
+          <h2>{{ $s['heading'] }}</h2>
         @endif
-        {!! $section['content'] ?? '' !!}
+        <p>{!! $s['content'] !!}</p>
       @endforeach
     @else
-      <h1>T&eacute;rminos y Condiciones</h1>
-      <p class="legal-meta">&Uacute;ltima actualizaci&oacute;n: Abril 2026</p>
-
-      <p>Las presentes condiciones regulan el acceso y uso del sitio web titularidad de SANZAHRA. El acceso y navegaci&oacute;n por este sitio implica la aceptaci&oacute;n sin reservas de los t&eacute;rminos recogidos en este documento.</p>
-
       <h2>1. Informaci&oacute;n general</h2>
       <p>En cumplimiento del deber de informaci&oacute;n establecido en la Ley 34/2002, de Servicios de la Sociedad de la Informaci&oacute;n y Comercio Electr&oacute;nico (LSSI-CE), se informa al usuario de que el titular del dominio <strong>sanzahra.com</strong> es SANZAHRA, con CIF B-00000000 y domicilio en Calle C&oacute;rdoba 6, 29001 M&aacute;laga (Espa&ntilde;a). Puedes contactar con nosotros en <a href="mailto:info@sanzahra.com">info@sanzahra.com</a>.</p>
 

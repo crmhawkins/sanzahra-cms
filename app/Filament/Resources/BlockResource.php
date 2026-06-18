@@ -81,6 +81,7 @@ class BlockResource extends Resource
                 Forms\Components\TextInput::make('title')->label('Título'),
                 static::richEditor('paragraph_1', 'Párrafo 1'),
                 static::richEditor('paragraph_2', 'Párrafo 2'),
+                Forms\Components\TagsInput::make('tags')->label('Tags (opcional)'),
                 Forms\Components\Grid::make(2)->schema([
                     Forms\Components\TextInput::make('button_text')->label('Texto botón'),
                     Forms\Components\TextInput::make('button_url')->label('URL botón'),
@@ -122,8 +123,8 @@ class BlockResource extends Resource
 
             'cta_final' => [
                 Forms\Components\TextInput::make('section_label')->label('Etiqueta sección'),
-                Forms\Components\TextInput::make('title')->label('Título'),
-                static::richEditor('description', 'Descripción'),
+                Forms\Components\TextInput::make('title')->label('Título (admite <br>)'),
+                Forms\Components\Textarea::make('description')->label('Descripción')->rows(2),
                 Forms\Components\Grid::make(2)->schema([
                     Forms\Components\TextInput::make('button_text')->label('Texto botón'),
                     Forms\Components\TextInput::make('button_url')->label('URL botón'),
@@ -131,9 +132,11 @@ class BlockResource extends Resource
             ],
 
             'page_hero' => [
-                Forms\Components\TextInput::make('kicker')->label('Kicker'),
-                Forms\Components\TextInput::make('brand')->label('Brand'),
+                Forms\Components\TextInput::make('kicker')->label('Kicker (etiqueta superior)'),
+                Forms\Components\TextInput::make('title')->label('Título'),
+                Forms\Components\TextInput::make('brand')->label('Marca (texto grande, solo home/about)'),
                 Forms\Components\TextInput::make('subtitle')->label('Subtítulo'),
+                static::fileUpload('background_image', 'Imagen de fondo'),
             ],
 
             'breadcrumb' => [
@@ -161,8 +164,8 @@ class BlockResource extends Resource
 
             'stat_block' => [
                 Forms\Components\TextInput::make('number')->label('Número'),
-                Forms\Components\TextInput::make('title')->label('Título'),
-                static::richEditor('description', 'Descripción'),
+                Forms\Components\TextInput::make('title')->label('Título (admite <br>)'),
+                Forms\Components\Textarea::make('description')->label('Descripción')->rows(4),
             ],
 
             'timeline' => [
@@ -170,7 +173,7 @@ class BlockResource extends Resource
                 Forms\Components\TextInput::make('title')->label('Título'),
                 static::repeater('items', 'Hitos')->schema([
                     Forms\Components\TextInput::make('year')->label('Año'),
-                    static::richEditor('description', 'Descripción'),
+                    Forms\Components\Textarea::make('description')->label('Descripción')->rows(3),
                 ]),
             ],
 
@@ -194,12 +197,14 @@ class BlockResource extends Resource
             ],
 
             'service_rows' => [
-                static::repeater('rows', 'Filas')->schema([
+                static::repeater('services', 'Servicios')->schema([
                     Forms\Components\TextInput::make('number')->label('Número'),
                     Forms\Components\TextInput::make('title')->label('Título'),
                     static::richEditor('description', 'Descripción'),
+                    Forms\Components\TagsInput::make('bullets')->label('Puntos (lista)'),
                     static::fileUpload('image', 'Imagen'),
                     Forms\Components\TextInput::make('url')->label('URL'),
+                    Forms\Components\Toggle::make('reverse')->label('Invertir orden (imagen a la izquierda)'),
                 ]),
             ],
 
@@ -208,12 +213,13 @@ class BlockResource extends Resource
                 Forms\Components\TextInput::make('title')->label('Título'),
                 static::richEditor('description', 'Descripción'),
                 static::repeater('brands', 'Marcas')->schema([
-                    Forms\Components\TextInput::make('logo_text')->label('Texto logo'),
+                    Forms\Components\TextInput::make('name')->label('Nombre de la marca'),
                     Forms\Components\Textarea::make('description')->label('Descripción'),
-                    Forms\Components\TextInput::make('button_text')->label('Texto botón'),
-                    static::fileUpload('modal_image', 'Imagen modal'),
-                    Forms\Components\TextInput::make('modal_title')->label('Título modal'),
-                    Forms\Components\TextInput::make('modal_subtitle')->label('Subtítulo modal'),
+                    Forms\Components\Select::make('status')->label('Estado')->options([
+                        'coming_soon' => 'Próximamente',
+                        'available'   => 'Disponible',
+                    ]),
+                    static::fileUpload('modal_image', 'Imagen'),
                 ]),
             ],
 
@@ -222,8 +228,7 @@ class BlockResource extends Resource
                 Forms\Components\TextInput::make('title')->label('Título'),
                 static::fileUpload('image', 'Imagen'),
                 static::richEditor('description', 'Descripción'),
-                Forms\Components\KeyValue::make('form_placeholders')->label('Placeholders formulario'),
-                Forms\Components\TextInput::make('form_submit_text')->label('Texto enviar'),
+                Forms\Components\TagsInput::make('fields')->label('Campos del formulario'),
             ],
 
             'identidad_tags' => [
@@ -239,18 +244,17 @@ class BlockResource extends Resource
                 Forms\Components\TextInput::make('section_label')->label('Etiqueta sección'),
                 Forms\Components\TextInput::make('title')->label('Título'),
                 static::richEditor('description', 'Descripción'),
-                static::fileUpload('image_break_image', 'Imagen break'),
-                Forms\Components\TextInput::make('image_break_title')->label('Título image break'),
-                Forms\Components\TextInput::make('image_break_subtitle')->label('Subtítulo image break'),
-                Forms\Components\TextInput::make('card_logo')->label('Logo card'),
-                Forms\Components\Textarea::make('card_description')->label('Descripción card'),
-                Forms\Components\TextInput::make('card_badge')->label('Badge card'),
+                static::fileUpload('image_break', 'Imagen'),
+                Forms\Components\TextInput::make('break_heading')->label('Título sobre la imagen'),
+                Forms\Components\TextInput::make('break_sub')->label('Subtítulo sobre la imagen'),
+                Forms\Components\TextInput::make('badge')->label('Etiqueta (badge)'),
             ],
 
             'gallery' => [
-                static::repeater('images', 'Imágenes')->schema([
+                Forms\Components\TextInput::make('section_label')->label('Etiqueta sección'),
+                Forms\Components\TextInput::make('title')->label('Título'),
+                static::repeater('items', 'Imágenes')->schema([
                     static::fileUpload('image', 'Imagen'),
-                    Forms\Components\TextInput::make('caption')->label('Caption'),
                 ]),
             ],
 
@@ -268,15 +272,16 @@ class BlockResource extends Resource
                 Forms\Components\TextInput::make('section_label')->label('Etiqueta sección'),
                 Forms\Components\TextInput::make('title')->label('Título'),
                 static::richEditor('description', 'Descripción'),
-                static::fileUpload('logo', 'Logo'),
-                Forms\Components\TextInput::make('partner_name')->label('Nombre partner'),
-                Forms\Components\TextInput::make('url')->label('URL'),
+                Forms\Components\Grid::make(2)->schema([
+                    Forms\Components\TextInput::make('button_text')->label('Texto botón'),
+                    Forms\Components\TextInput::make('button_url')->label('URL botón'),
+                ]),
             ],
 
             'portfolio_filters' => [
                 static::repeater('filters', 'Filtros')->schema([
-                    Forms\Components\TextInput::make('key')->label('Clave'),
-                    Forms\Components\TextInput::make('label')->label('Label'),
+                    Forms\Components\TextInput::make('label')->label('Etiqueta'),
+                    Forms\Components\TextInput::make('value')->label('Valor (categoría)'),
                 ]),
             ],
 
@@ -284,10 +289,14 @@ class BlockResource extends Resource
                 static::repeater('items', 'Items')->schema([
                     static::fileUpload('image', 'Imagen'),
                     Forms\Components\TextInput::make('title')->label('Título'),
-                    Forms\Components\TextInput::make('category')->label('Categoría'),
+                    Forms\Components\TextInput::make('category')
+                        ->label('Categorías para el filtro')
+                        ->helperText('Slugs separados por espacio, deben coincidir con los filtros. Ej: "moda eventos".'),
+                    Forms\Components\TextInput::make('category_label')
+                        ->label('Etiqueta visible (opcional)')
+                        ->helperText('Texto mostrado bajo el proyecto. Si se deja vacío se genera a partir de las categorías.'),
                     Forms\Components\Select::make('aspect_ratio')->label('Ratio')
                         ->options(['3/4' => '3/4', '4/5' => '4/5', '1/1' => '1/1', '3/2' => '3/2', '2/3' => '2/3']),
-                    Forms\Components\TextInput::make('categories')->label('Categorías'),
                 ]),
             ],
 
@@ -295,16 +304,16 @@ class BlockResource extends Resource
                 static::fileUpload('image', 'Imagen'),
                 Forms\Components\TextInput::make('section_label')->label('Etiqueta sección'),
                 Forms\Components\TextInput::make('title')->label('Título'),
-                Forms\Components\Textarea::make('lead_text')->label('Texto intro'),
-                Forms\Components\KeyValue::make('form_placeholders')->label('Placeholders formulario'),
-                Forms\Components\TextInput::make('form_submit_text')->label('Texto enviar'),
-                Forms\Components\TextInput::make('email_contacto')->label('Email contacto')->email(),
-                Forms\Components\TextInput::make('telefono_contacto')->label('Teléfono'),
-                Forms\Components\TextInput::make('direccion_contacto')->label('Dirección'),
+                Forms\Components\Textarea::make('lead')->label('Texto intro')->rows(3),
+                Forms\Components\TagsInput::make('form_fields')->label('Campos del formulario'),
+                Forms\Components\TextInput::make('email')->label('Email contacto')->email(),
+                Forms\Components\TextInput::make('tel')->label('Teléfono'),
+                Forms\Components\TextInput::make('direccion')->label('Dirección'),
             ],
 
             'legal_sections' => [
                 Forms\Components\DatePicker::make('last_updated')->label('Última actualización'),
+                static::richEditor('intro', 'Introducción'),
                 static::repeater('sections', 'Secciones')->schema([
                     Forms\Components\TextInput::make('heading')->label('Encabezado'),
                     static::richEditor('content', 'Contenido'),

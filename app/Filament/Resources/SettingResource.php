@@ -20,6 +20,11 @@ class SettingResource extends Resource
 
     protected static ?string $navigationLabel = 'Ajustes globales';
 
+    // Ocultamos el editor "crudo" clave/valor del menú: la página
+    // "Configuración del sitio" es la vía amable para editar estos ajustes.
+    // El recurso sigue accesible por URL para usos avanzados.
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static ?string $modelLabel = 'Ajuste';
 
     protected static ?string $pluralModelLabel = 'Ajustes globales';
