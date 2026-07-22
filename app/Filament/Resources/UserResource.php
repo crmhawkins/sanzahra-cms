@@ -49,18 +49,12 @@ class UserResource extends Resource
                 ->dehydrated(fn ($state) => filled($state))
                 ->required(fn (string $context): bool => $context === 'create'),
 
-            Forms\Components\Toggle::make('email_verified_at')
+            Forms\Components\Select::make('email_verified_at')
                 ->label('Email verificado')
-                ->onIcon('heroicon-m-check')
-                ->offIcon('heroicon-m-x-mark')
-                ->getStateUsing(fn ($record) => $record?->email_verified_at !== null)
-                ->dehydrateStateUsing(fn ($state) => $state ? now() : null)
-                ->afterStateUpdated(function ($state, $record) {
-                    if ($record) {
-                        $record->email_verified_at = $state ? now() : null;
-                        $record->save();
-                    }
-                }),
+                ->options(['verified' => '✓ Verificado', 'unverified' => '✗ Sin verificar'])
+                ->default('verified')
+                ->formatStateUsing(fn ($state) => $state ? 'verified' : 'unverified')
+                ->dehydrateStateUsing(fn ($state) => $state === 'verified' ? now() : null),
         ]);
     }
 
