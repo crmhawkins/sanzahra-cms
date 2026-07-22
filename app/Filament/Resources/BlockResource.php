@@ -9,7 +9,6 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Support\Facades\Storage;
 
 class BlockResource extends Resource
 {
@@ -40,35 +39,7 @@ class BlockResource extends Resource
             ->image()
             ->disk('public')
             ->directory('uploads')
-            ->imagePreviewHeight('150')
-            ->afterStateHydrated(function (Forms\Components\FileUpload $component, $state) use ($name): void {
-                if (!$state) return;
-                if (str_starts_with($state, 'uploads/') && Storage::disk('public')->exists($state)) return;
-
-                try {
-                    if (str_starts_with($state, 'http')) {
-                        $ext = pathinfo(parse_url($state, PHP_URL_PATH), PATHINFO_EXTENSION) ?: 'jpg';
-                        $storagePath = 'uploads/migrated-' . md5($state) . '.' . $ext;
-                        if (!Storage::disk('public')->exists($storagePath)) {
-                            $contents = @file_get_contents($state);
-                            if (!$contents) return;
-                            Storage::disk('public')->put($storagePath, $contents);
-                        }
-                    } else {
-                        $localPath = public_path($state);
-                        $ext = pathinfo($localPath, PATHINFO_EXTENSION) ?: 'jpg';
-                        $storagePath = 'uploads/migrated-' . md5($state) . '.' . $ext;
-                        if (!Storage::disk('public')->exists($storagePath)) {
-                            $contents = @file_get_contents($localPath);
-                            if (!$contents) return;
-                            Storage::disk('public')->put($storagePath, $contents);
-                        }
-                    }
-                    $component->state($storagePath);
-                } catch (\Throwable $e) {
-                    // Dejar vacío si la migración falla
-                }
-            });
+            ->imagePreviewHeight('150');
     }
 
     protected static function richEditor(string $name, string $label): Forms\Components\RichEditor
