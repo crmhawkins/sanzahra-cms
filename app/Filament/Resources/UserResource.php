@@ -54,6 +54,7 @@ class UserResource extends Resource
                 ->onIcon('heroicon-m-check')
                 ->offIcon('heroicon-m-x-mark')
                 ->getStateUsing(fn ($record) => $record?->email_verified_at !== null)
+                ->dehydrateStateUsing(fn ($state) => $state ? now() : null)
                 ->afterStateUpdated(function ($state, $record) {
                     if ($record) {
                         $record->email_verified_at = $state ? now() : null;
