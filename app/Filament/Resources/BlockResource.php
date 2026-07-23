@@ -9,6 +9,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\HtmlString;
 
 class BlockResource extends Resource
@@ -38,15 +39,18 @@ class BlockResource extends Resource
         return Forms\Components\Group::make([
             Forms\Components\Placeholder::make("{$name}_current_preview")
                 ->label("{$label} (imagen actual)")
-                ->content(function (Forms\Get $get) use ($name): HtmlString {
-                    $val = $get($name) ?? '';
-                    if ($val === '' || str_starts_with($val, 'uploads/')) {
+                ->content(function (?Model $record) use ($name): HtmlString {
+                    $val = $record ? data_get($record->data, $name, '') : '';
+                    if (!is_string($val) || $val === '' || str_starts_with($val, 'uploads/')) {
                         return new HtmlString('');
                     }
                     $url = rtrim(config('app.url'), '/') . '/' . ltrim($val, '/');
                     return new HtmlString('<img src="' . e($url) . '" style="max-height:150px;border-radius:6px;">');
                 })
-                ->visible(fn (Forms\Get $get): bool => ($val = $get($name) ?? '') !== '' && !str_starts_with($val, 'uploads/')),
+                ->visible(function (?Model $record) use ($name): bool {
+                    $val = $record ? data_get($record->data, $name, '') : '';
+                    return is_string($val) && $val !== '' && !str_starts_with($val, 'uploads/');
+                }),
 
             Forms\Components\FileUpload::make($name)
                 ->label("{$label} (subir nueva)")
