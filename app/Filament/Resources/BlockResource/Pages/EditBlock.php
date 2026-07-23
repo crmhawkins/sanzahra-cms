@@ -62,12 +62,18 @@ class EditBlock extends EditRecord
                         $contents = file_get_contents($localPath);
                     }
                     if (!$contents) {
-                        $url = rtrim(config('app.url'), '/') . '/' . ltrim($value, '/');
-                        try {
-                            $response = Http::timeout(10)->get($url);
-                            $contents = $response->successful() ? $response->body() : false;
-                        } catch (\Throwable $e) {
-                            $contents = false;
+                        $baseUrl = rtrim(config('app.url'), '/');
+                        $path    = '/' . ltrim($value, '/');
+                        foreach ([$baseUrl . $path, str_replace('https://', 'http://', $baseUrl) . $path] as $url) {
+                            try {
+                                $response = Http::timeout(15)->withOptions(['verify' => false])->get($url);
+                                if ($response->successful()) {
+                                    $contents = $response->body();
+                                    break;
+                                }
+                            } catch (\Throwable $e) {
+                                // try next URL
+                            }
                         }
                     }
                 }
