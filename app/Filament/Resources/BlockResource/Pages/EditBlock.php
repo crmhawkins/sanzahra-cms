@@ -52,9 +52,19 @@ class EditBlock extends EditRecord
         try {
             $storagePath = 'uploads/migrated-' . md5($value) . '.' . $ext;
             if (!Storage::disk('public')->exists($storagePath)) {
-                $contents = str_starts_with($value, 'http')
-                    ? @file_get_contents($value)
-                    : @file_get_contents(public_path($value));
+                $contents = false;
+                if (str_starts_with($value, 'http')) {
+                    $contents = @file_get_contents($value);
+                } else {
+                    $localPath = public_path($value);
+                    if (file_exists($localPath)) {
+                        $contents = file_get_contents($localPath);
+                    }
+                    if (!$contents) {
+                        $url = rtrim(config('app.url'), '/') . '/' . ltrim($value, '/');
+                        $contents = @file_get_contents($url);
+                    }
+                }
                 if (!$contents) return $value;
                 Storage::disk('public')->put($storagePath, $contents);
             }
