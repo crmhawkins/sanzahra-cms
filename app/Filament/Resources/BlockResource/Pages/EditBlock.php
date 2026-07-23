@@ -5,6 +5,7 @@ namespace App\Filament\Resources\BlockResource\Pages;
 use App\Filament\Resources\BlockResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 
 class EditBlock extends EditRecord
@@ -62,7 +63,12 @@ class EditBlock extends EditRecord
                     }
                     if (!$contents) {
                         $url = rtrim(config('app.url'), '/') . '/' . ltrim($value, '/');
-                        $contents = @file_get_contents($url);
+                        try {
+                            $response = Http::timeout(10)->get($url);
+                            $contents = $response->successful() ? $response->body() : false;
+                        } catch (\Throwable $e) {
+                            $contents = false;
+                        }
                     }
                 }
                 if (!$contents) return $value;
