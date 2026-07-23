@@ -9,6 +9,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\HtmlString;
 
 class BlockResource extends Resource
 {
@@ -32,14 +33,29 @@ class BlockResource extends Resource
     // Data-schema builder (polimórfico por type)
     // -----------------------------------------------------------------------
 
-    protected static function fileUpload(string $name, string $label): Forms\Components\FileUpload
+    protected static function fileUpload(string $name, string $label): Forms\Components\Group
     {
-        return Forms\Components\FileUpload::make($name)
-            ->label($label)
-            ->image()
-            ->disk('public')
-            ->directory('uploads')
-            ->imagePreviewHeight('150');
+        return Forms\Components\Group::make([
+            Forms\Components\Placeholder::make("{$name}_current_preview")
+                ->label("{$label} (imagen actual)")
+                ->content(function (Forms\Get $get) use ($name): HtmlString {
+                    $val = $get($name) ?? '';
+                    if ($val === '' || str_starts_with($val, 'uploads/')) {
+                        return new HtmlString('');
+                    }
+                    $url = rtrim(config('app.url'), '/') . '/' . ltrim($val, '/');
+                    return new HtmlString('<img src="' . e($url) . '" style="max-height:150px;border-radius:6px;">');
+                })
+                ->visible(fn (Forms\Get $get): bool => ($val = $get($name) ?? '') !== '' && !str_starts_with($val, 'uploads/')),
+
+            Forms\Components\FileUpload::make($name)
+                ->label("{$label} (subir nueva)")
+                ->image()
+                ->disk('public')
+                ->directory('uploads')
+                ->imagePreviewHeight('150')
+                ->dehydrated(fn ($state): bool => filled($state)),
+        ]);
     }
 
     protected static function richEditor(string $name, string $label): Forms\Components\RichEditor
