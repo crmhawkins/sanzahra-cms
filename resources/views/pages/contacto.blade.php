@@ -36,14 +36,31 @@
         <p class="section-label">{{ $contact?->get('section_label', 'Escríbenos') }}</p>
         <h2 class="section-title">{!! $contact?->get('title', 'Cu&eacute;ntanos<br>tu proyecto') !!}</h2>
         <p class="contact-duo-lead">{{ $contact?->get('lead', 'Respondemos en menos de 24 horas laborables con una propuesta personalizada.') }}</p>
-        <form class="contact-form-simple" onsubmit="event.preventDefault(); alert('Mensaje enviado. Gracias por tu interés.'); this.reset();">
-          <input type="text" name="nombre" placeholder="Nombre" required />
-          <input type="email" name="email" placeholder="Email" required />
-          <input type="tel" name="telefono" placeholder="Tel&eacute;fono" />
-          <input type="text" name="asunto" placeholder="Asunto" />
-          <textarea name="mensaje" rows="4" placeholder="Mensaje" required></textarea>
+
+        @if(session('contact_success'))
+          <div style="background:#d4edda;color:#155724;padding:14px 18px;border-radius:6px;margin-bottom:20px;font-size:15px;">
+            {{ session('contact_success') }}
+          </div>
+        @endif
+
+        @if($errors->any())
+          <div style="background:#f8d7da;color:#721c24;padding:14px 18px;border-radius:6px;margin-bottom:20px;font-size:14px;">
+            @foreach($errors->all() as $error)
+              <p style="margin:0 0 4px">{{ $error }}</p>
+            @endforeach
+          </div>
+        @endif
+
+        <form class="contact-form-simple" method="POST" action="{{ route('contact.send') }}">
+          @csrf
+          <input type="text" name="nombre" placeholder="Nombre" value="{{ old('nombre') }}" required />
+          <input type="email" name="email" placeholder="Email" value="{{ old('email') }}" required />
+          <input type="tel" name="telefono" placeholder="Tel&eacute;fono" value="{{ old('telefono') }}" />
+          <input type="text" name="asunto" placeholder="Asunto" value="{{ old('asunto') }}" />
+          <textarea name="mensaje" rows="4" placeholder="Mensaje" required>{{ old('mensaje') }}</textarea>
           <button type="submit">Enviar</button>
         </form>
+
         <div class="contact-simple-info">
           <a href="mailto:{{ $contactEmail }}">{{ $contactEmail }}</a>
           <a href="tel:{{ preg_replace('/\s+/', '', $contactTel) }}">{{ $contactTel }}</a>
