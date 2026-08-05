@@ -53,6 +53,11 @@
 
         <form class="contact-form-simple" method="POST" action="{{ route('contact.send') }}">
           @csrf
+          {{-- Anti-spam: honeypot (invisible para humanos) + marca de tiempo cifrada --}}
+          <div style="position:absolute;left:-9999px;top:-9999px;" aria-hidden="true">
+            <input type="text" name="website" tabindex="-1" autocomplete="off" value="" />
+          </div>
+          <input type="hidden" name="form_time" value="{{ \Illuminate\Support\Facades\Crypt::encryptString((string) now()->timestamp) }}" />
           <input type="text" name="nombre" placeholder="Nombre" value="{{ old('nombre') }}" required />
           <input type="email" name="email" placeholder="Email" value="{{ old('email') }}" required />
           <input type="tel" name="telefono" placeholder="Tel&eacute;fono" value="{{ old('telefono') }}" />
