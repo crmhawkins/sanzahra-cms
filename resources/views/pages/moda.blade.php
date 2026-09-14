@@ -116,13 +116,34 @@
           <p class="section-label">{{ $talento?->get('section_label', 'Captaci&oacute;n de talento') }}</p>
           <h2 class="section-title">{!! $talento?->get('title', 'Buscamos la<br>pr&oacute;xima generaci&oacute;n') !!}</h2>
           <p class="section-text">{!! $talento?->get('description', '&iquest;Eres dise&ntilde;ador, modelo, estilista o creativo emergente? Estamos siempre atentos a nuevas voces. Env&iacute;anos tu portfolio o tu candidatura y nuestro equipo te contactar&aacute; si hay una oportunidad que encaje.') !!}</p>
-          <form class="contact-form-simple reveal" onsubmit="event.preventDefault(); alert('Candidatura recibida. Gracias por tu interés.'); this.reset();" style="margin-top: 2rem;">
-            <input type="text" name="nombre" placeholder="Nombre completo" required />
-            <input type="email" name="email" placeholder="Email" required />
-            <input type="tel" name="telefono" placeholder="Tel&eacute;fono" />
-            <input type="text" name="perfil" placeholder="Tu perfil (dise&ntilde;ador, modelo, estilista...)" required />
-            <input type="url" name="portfolio" placeholder="Link a tu portfolio o redes sociales" />
-            <textarea name="mensaje" rows="4" placeholder="Cu&eacute;ntanos brevemente sobre ti" required></textarea>
+          @if(session('talento_success'))
+            <div style="background:#d4edda;color:#155724;padding:14px 18px;border-radius:6px;margin-top:2rem;font-size:15px;">
+              {{ session('talento_success') }}
+            </div>
+          @endif
+
+          @if($errors->talento->any())
+            <div style="background:#f8d7da;color:#721c24;padding:14px 18px;border-radius:6px;margin-top:2rem;font-size:14px;">
+              @foreach($errors->talento->all() as $error)
+                <p style="margin:0 0 4px">{{ $error }}</p>
+              @endforeach
+            </div>
+            <script>document.addEventListener('DOMContentLoaded', function () { location.hash = '#talento'; });</script>
+          @endif
+
+          <form class="contact-form-simple reveal" method="POST" action="{{ route('talento.send') }}" style="margin-top: 2rem;">
+            @csrf
+            {{-- Anti-spam: honeypot (invisible para humanos) + marca de tiempo cifrada --}}
+            <div style="position:absolute;left:-9999px;top:-9999px;" aria-hidden="true">
+              <input type="text" name="website" tabindex="-1" autocomplete="off" value="" />
+            </div>
+            <input type="hidden" name="form_time" value="{{ \Illuminate\Support\Facades\Crypt::encryptString((string) now()->timestamp) }}" />
+            <input type="text" name="nombre" placeholder="Nombre completo" value="{{ old('nombre') }}" required />
+            <input type="email" name="email" placeholder="Email" value="{{ old('email') }}" required />
+            <input type="tel" name="telefono" placeholder="Tel&eacute;fono" value="{{ old('telefono') }}" />
+            <input type="text" name="perfil" placeholder="Tu perfil (dise&ntilde;ador, modelo, estilista...)" value="{{ old('perfil') }}" required />
+            <input type="text" name="portfolio" placeholder="Link a tu portfolio o redes sociales" value="{{ old('portfolio') }}" />
+            <textarea name="mensaje" rows="4" placeholder="Cu&eacute;ntanos brevemente sobre ti" required>{{ old('mensaje') }}</textarea>
             <button type="submit">Enviar candidatura</button>
           </form>
         </div>
