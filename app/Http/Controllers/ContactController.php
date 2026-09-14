@@ -60,7 +60,7 @@ class ContactController extends Controller
         }
 
         $recipient = env('CONTACT_RECIPIENT', 'info@sanzahra.com');
-        $cc = array_values(array_filter(array_map('trim', explode(',', (string) env('CONTACT_CC', 'diego@hawkins.es')))));
+        $cc = array_values(array_filter(array_map('trim', explode(',', (string) env('CONTACT_CC', '')))));
 
         $mail = Mail::to($recipient);
         if ($cc) {
