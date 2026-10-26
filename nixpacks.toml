@@ -1,0 +1,5 @@
+# PHP2Shell (CVE-2026-109618/109619): PHP 8.2.35 parcheado desde nixos-26.05, misma version menor (8.2) que antes.
+# El resto de paquetes es la lista que genera nixpacks 1.41 para este repo, cambiando php->php82 (en nixpkgs reciente php=8.4/8.5).
+[phases.setup]
+nixpkgsArchive = '1f607aa79b6356ed45d3cd3c8079c196e79efa2c'
+nixPkgs = ['(php82.withExtensions (pe: pe.enabled ++ []))', 'nginx', 'libmysqlclient', 'php82Packages.composer', 'nodejs_22', 'npm-9_x']
